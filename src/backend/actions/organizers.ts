@@ -59,9 +59,19 @@ export async function updateOrganizerProfileAction(formData: FormData): Promise<
     new_display_name: displayName,
   });
 
+  if (error) {
+    console.error("update_organizer_profile failed:", {
+      code: error.code,
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+    });
+  }
+
   if (error?.code === "42501") redirect("/faculty/organizers?result=unauthorized");
   if (error?.code === "P0002") redirect("/faculty/organizers?result=profile-not-found");
   if (error?.code === "22023") redirect("/faculty/organizers?result=profile-invalid");
+  if (error?.code === "PGRST202" || error?.code === "42883") redirect("/faculty/organizers?result=migration-missing");
   if (error) redirect("/faculty/organizers?result=error");
 
   revalidatePath("/faculty/organizers");
