@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { signOutAction } from "@/backend/actions/dashboard";
 import { requireUserRole } from "@/backend/lib/auth/require-role";
 import { OrganizerManagement } from "@/app/faculty/organizers/organizer-management";
+import { OrganizerNotificationBanner } from "@/app/faculty/organizers/organizer-notification-banner";
 import type { OrganizerApplication } from "@/backend/lib/supabase/database.types";
 import type { Metadata } from "next";
 
@@ -71,7 +72,7 @@ async function ManageOrganizersContent({ searchParams }: ManageOrganizersPagePro
       <p className="text-sm font-semibold uppercase tracking-[0.16em] text-indigo-700">Faculty/Admin</p>
       <h1 className="mt-3 text-3xl font-semibold tracking-tight text-zinc-950">Manage organizers</h1>
       <p className="mt-2 text-zinc-600">Review applications and manage organizer access.</p>
-      {resultMessage && <p role={isSuccess ? "status" : "alert"} className={`mt-5 rounded-lg p-4 text-sm ${isSuccess ? "bg-emerald-50 text-emerald-900" : "bg-amber-50 text-amber-950"}`}>{resultMessage}</p>}
+      {resultMessage && <OrganizerNotificationBanner key={result ?? "notification"} result={result} message={resultMessage} isSuccess={isSuccess} />}
       {error ? <p role="alert" className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-950">Organizer applications could not be loaded. Confirm migration 202610310006_organizer_approval_and_email_outbox.sql has been applied.</p> : <OrganizerManagement applications={applications} />}
     </section>
   </main>;
