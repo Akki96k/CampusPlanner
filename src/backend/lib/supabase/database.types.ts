@@ -93,8 +93,8 @@ export type Database = {
       };
       organizer_applications: {
         Row: { organizer_id: string; status: "pending" | "approved" | "rejected" | "removed"; submitted_at: string; rejected_reason: string | null; removed_reason: string | null };
-        Insert: Record<string, never>;
-        Update: Record<string, never>;
+        Insert: { organizer_id: string; status?: "pending" | "approved" | "rejected" | "removed"; submitted_at?: string; approved_at?: string | null; approved_by?: string | null; decided_at?: string | null; decided_by?: string | null; rejected_reason?: string | null; removed_at?: string | null; removed_by?: string | null; removed_reason?: string | null; updated_at?: string };
+        Update: { status?: "pending" | "approved" | "rejected" | "removed"; approved_at?: string | null; approved_by?: string | null; decided_at?: string | null; decided_by?: string | null; rejected_reason?: string | null; removed_at?: string | null; removed_by?: string | null; removed_reason?: string | null; updated_at?: string };
         Relationships: [];
       };
     };
@@ -106,6 +106,9 @@ export type Database = {
       claim_organizer_email_outbox: { Args: { target_id: string }; Returns: OrganizerEmailOutbox[] };
       finish_organizer_email_outbox: { Args: { target_id: string; succeeded: boolean; failure_detail?: string | null }; Returns: undefined };
       update_organizer_profile: { Args: { target_organizer: string; new_display_name: string }; Returns: undefined };
+      faculty_approve_new_organizer: { Args: { target_organizer: string }; Returns: undefined };
+      organizer_events_count: { Args: { target_organizer: string }; Returns: number };
+      faculty_delete_organizer: { Args: { target_organizer: string }; Returns: undefined };
     };
     Enums: {
       app_role: "student" | "organizer" | "faculty_admin";

@@ -54,8 +54,7 @@ async function FacultyContent({ searchParams }: FacultyPageProps) {
     <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-8 sm:py-10">
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-5">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-indigo-700">Faculty/Admin Portal</p>
-          <h1 className="mt-1 text-2xl sm:text-3xl font-bold tracking-tight text-zinc-950">Event approval queue</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-950">Event approval queue</h1>
           <p className="mt-1 text-sm text-zinc-600">Review event details, then approve or reject the pending submission.</p>
         </div>
         <div>

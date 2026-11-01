@@ -43,28 +43,48 @@ async function ManageOrganizersContent({ searchParams }: ManageOrganizersPagePro
       : result === "stale"
         ? "This application changed before your action completed. Refresh the list."
         : result === "reason-required"
-          ? "Enter a reason before rejecting or removing an organizer."
+          ? "Enter a reason before rejecting or deactivating an organizer."
           : result === "profile-updated"
             ? "Organizer profile updated successfully."
             : result === "profile-invalid"
               ? "Display name must be between 1 and 100 characters."
               : result === "profile-not-found"
                 ? "Organizer profile was not found."
-                : result === "migration-missing"
-                  ? "Database migration 202611010007_faculty_edit_organizer_profile.sql must be applied in your Supabase project before organizer profiles can be edited."
-                  : result === "invalid"
-                    ? "The organizer action was invalid. Refresh and try again."
-                  : result === "error"
-                    ? "We couldn’t update this organizer. Please refresh and try again."
-                    : result === "unauthorized"
-                      ? "Your faculty account is not authorized to manage organizers.": null;
+                : result === "organizer-created"
+                  ? "New organizer account created successfully."
+                  : result === "organizer-deleted"
+                    ? "Organizer account permanently deleted."
+                    : result === "cannot-delete-has-events"
+                      ? "Cannot permanently delete this organizer because they have created campus events. Please deactivate the organizer instead to safely preserve event history."
+                      : result === "email-exists"
+                        ? "An account with this email address already exists. Please use a different email or manage the existing account below."
+                        : result === "create-name-invalid"
+                          ? "Please enter a valid display name between 1 and 100 characters."
+                          : result === "create-email-invalid"
+                            ? "Please enter a valid email address."
+                            : result === "create-password-invalid"
+                              ? "Password must be between 8 and 128 characters."
+                              : result === "admin-key-missing"
+                                ? "SUPABASE_SERVICE_ROLE_KEY is required in .env.local to provision accounts via the Admin API."
+                                : result === "migration-missing"
+                                  ? "Database migration 202611010007_faculty_edit_organizer_profile.sql must be applied in your Supabase project before organizer profiles can be edited."
+                                  : result === "invalid"
+                                    ? "The organizer action was invalid. Refresh and try again."
+                                  : result === "error" || result === "create-error"
+                                    ? "We couldn’t update this organizer. Please refresh and try again."
+                                    : result === "unauthorized"
+                                      ? "Your faculty account is not authorized to manage organizers.": null;
 
-  const isSuccess = result === "updated" || result === "profile-updated";
+  const isSuccess =
+    result === "updated" ||
+    result === "updated-email-pending" ||
+    result === "profile-updated" ||
+    result === "organizer-created" ||
+    result === "organizer-deleted";
 
   return <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-8 sm:py-10">
     <div className="border-b border-slate-200 pb-5">
-      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-indigo-700">Faculty/Admin Portal</p>
-      <h1 className="mt-1 text-2xl sm:text-3xl font-bold tracking-tight text-zinc-950">Manage organizers</h1>
+      <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-950">Manage organizers</h1>
       <p className="mt-1 text-sm text-zinc-600">Review applications and manage organizer access.</p>
     </div>
     <section className="pt-6 sm:pt-8">

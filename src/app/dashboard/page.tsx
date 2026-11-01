@@ -9,6 +9,7 @@ import { markAttendanceAction } from "@/backend/actions/registration";
 import { StudentSidebar } from "@/app/dashboard/student-sidebar";
 import { OrganizerSidebar } from "@/app/organizer/organizer-sidebar";
 import { FacultySidebar } from "@/app/faculty/faculty-sidebar";
+import { resolveDashboardSidebarKind } from "@/backend/lib/auth/dashboard-sidebar";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Dashboard" };
@@ -97,9 +98,10 @@ async function DashboardContent({ searchParams }: DashboardPageProps) {
   const events: CampusEvent[] = eventsResult.data ?? [];
   const migrationMissing = eventsResult.error?.code === "42P01" || eventsResult.error?.code === "PGRST205";
 
-  const sidebar = role === "faculty_admin" ? (
+  const sidebarKind = resolveDashboardSidebarKind(role);
+  const sidebar = sidebarKind === "faculty" ? (
     <FacultySidebar />
-  ) : role === "organizer" && organizerApproved ? (
+  ) : sidebarKind === "organizer" ? (
     <OrganizerSidebar />
   ) : (
     <StudentSidebar email={email} />
