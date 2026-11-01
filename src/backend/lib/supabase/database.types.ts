@@ -105,6 +105,7 @@ export type Database = {
       list_organizer_applications: { Args: Record<string, never>; Returns: OrganizerApplication[] };
       claim_organizer_email_outbox: { Args: { target_id: string }; Returns: OrganizerEmailOutbox[] };
       finish_organizer_email_outbox: { Args: { target_id: string; succeeded: boolean; failure_detail?: string | null }; Returns: undefined };
+      update_organizer_profile: { Args: { target_organizer: string; new_display_name: string }; Returns: undefined };
     };
     Enums: {
       app_role: "student" | "organizer" | "faculty_admin";

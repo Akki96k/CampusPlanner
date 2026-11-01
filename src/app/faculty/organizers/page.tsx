@@ -30,12 +30,20 @@ export default async function ManageOrganizersPage({ searchParams }: { searchPar
         ? "This application changed before your action completed. Refresh the list."
         : result === "reason-required"
           ? "Enter a reason before rejecting or removing an organizer."
-          : result === "invalid"
-            ? "The organizer action was invalid. Refresh and try again."
-            : result === "error"
-              ? "We couldn’t update this organizer. Please refresh and try again."
-              : result === "unauthorized"
-                ? "Your faculty account is not authorized to manage organizers.": null;
+          : result === "profile-updated"
+            ? "Organizer profile updated successfully."
+            : result === "profile-invalid"
+              ? "Display name must be between 1 and 100 characters."
+              : result === "profile-not-found"
+                ? "Organizer profile was not found."
+                : result === "invalid"
+                  ? "The organizer action was invalid. Refresh and try again."
+                  : result === "error"
+                    ? "We couldn’t update this organizer. Please refresh and try again."
+                    : result === "unauthorized"
+                      ? "Your faculty account is not authorized to manage organizers.": null;
+
+  const isSuccess = result === "updated" || result === "profile-updated";
 
   return <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-10">
     <header className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm sm:px-6">
@@ -46,7 +54,7 @@ export default async function ManageOrganizersPage({ searchParams }: { searchPar
       <p className="text-sm font-semibold uppercase tracking-[0.16em] text-indigo-700">Faculty/Admin</p>
       <h1 className="mt-3 text-3xl font-semibold tracking-tight text-zinc-950">Manage organizers</h1>
       <p className="mt-2 text-zinc-600">Review applications and manage organizer access.</p>
-      {resultMessage && <p role={result === "updated" ? "status" : "alert"} className={`mt-5 rounded-lg p-4 text-sm ${result === "updated" ? "bg-emerald-50 text-emerald-900" : "bg-amber-50 text-amber-950"}`}>{resultMessage}</p>}
+      {resultMessage && <p role={isSuccess ? "status" : "alert"} className={`mt-5 rounded-lg p-4 text-sm ${isSuccess ? "bg-emerald-50 text-emerald-900" : "bg-amber-50 text-amber-950"}`}>{resultMessage}</p>}
       {error ? <p role="alert" className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-950">Organizer applications could not be loaded. Confirm migration 202610310006_organizer_approval_and_email_outbox.sql has been applied.</p> : <OrganizerManagement applications={applications} />}
     </section>
   </main>;
