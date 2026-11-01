@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+import { connection } from "next/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/backend/lib/supabase/server";
@@ -5,7 +7,16 @@ import { signOutAction } from "@/backend/actions/dashboard";
 import { NotificationCenter } from "@/components/notification-center";
 import { loadNotificationSnapshot } from "@/backend/lib/notifications/load";
 
-export default async function OrganizerAccessPage() {
+export default function OrganizerAccessPage() {
+  return (
+    <Suspense fallback={<main className="mx-auto flex min-h-screen max-w-2xl items-center px-5 py-10" aria-busy="true"><p className="text-sm text-slate-600">Loading organizer access…</p></main>}>
+      <OrganizerAccessContent />
+    </Suspense>
+  );
+}
+
+async function OrganizerAccessContent() {
+  await connection();
   const supabase = await createClient();
   const { data, error } = await supabase.auth.getClaims();
   const userId = data?.claims?.sub;

@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+import { connection } from "next/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { signOutAction } from "@/backend/actions/dashboard";
@@ -8,7 +10,20 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Manage Organizers" };
 
-export default async function ManageOrganizersPage({ searchParams }: { searchParams: Promise<{ result?: string }> }) {
+type ManageOrganizersPageProps = {
+  searchParams: Promise<{ result?: string }>;
+};
+
+export default function ManageOrganizersPage({ searchParams }: ManageOrganizersPageProps) {
+  return (
+    <Suspense fallback={<ManageOrganizersLoading />}>
+      <ManageOrganizersContent searchParams={searchParams} />
+    </Suspense>
+  );
+}
+
+async function ManageOrganizersContent({ searchParams }: ManageOrganizersPageProps) {
+  await connection();
   const [{ result }, { supabase }] = await Promise.all([searchParams, requireUserRole("faculty_admin")]);
   const applications: OrganizerApplication[] = [];
   let page = 0;
@@ -58,4 +73,8 @@ export default async function ManageOrganizersPage({ searchParams }: { searchPar
       {error ? <p role="alert" className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-950">Organizer applications could not be loaded. Confirm migration 202610310006_organizer_approval_and_email_outbox.sql has been applied.</p> : <OrganizerManagement applications={applications} />}
     </section>
   </main>;
+}
+
+function ManageOrganizersLoading() {
+  return <main className="mx-auto w-full max-w-6xl px-6 py-12" aria-busy="true"><p className="text-sm text-zinc-600">Loading organizer applications…</p></main>;
 }
