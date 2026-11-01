@@ -1,7 +1,5 @@
 import { Suspense } from "react";
 import { connection } from "next/server";
-import Link from "next/link";
-import { signOutAction } from "@/backend/actions/dashboard";
 import { approveEventAction, rejectEventAction } from "@/backend/actions/faculty";
 import { requireUserRole } from "@/backend/lib/auth/require-role";
 import type { CampusEvent } from "@/backend/lib/supabase/database.types";
@@ -53,33 +51,26 @@ async function FacultyContent({ searchParams }: FacultyPageProps) {
             : null;
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-10">
-      <header className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm sm:px-6">
-        <Link href="/dashboard" className="text-lg font-bold tracking-tight text-indigo-800">CampusPlanner</Link>
-        <div className="flex items-center gap-4">
-          <nav aria-label="Faculty navigation" className="flex items-center gap-4 text-sm">
-            <Link href="/dashboard" className="font-medium text-indigo-700 hover:text-indigo-900">Browse events</Link>
-            <Link href="/faculty" aria-current="page" className="font-medium text-zinc-600">Approval queue</Link>
-            <Link href="/faculty/organizers" className="font-medium text-zinc-600 hover:text-indigo-700">Manage organizers</Link>
-          </nav>
-          <form action={signOutAction}>
-            <button type="submit" className="rounded-lg border border-zinc-300 px-3 py-2 text-sm font-semibold text-zinc-800 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Sign out</button>
-          </form>
+    <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-8 sm:py-10">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-5">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-indigo-700">Faculty/Admin Portal</p>
+          <h1 className="mt-1 text-2xl sm:text-3xl font-bold tracking-tight text-zinc-950">Event approval queue</h1>
+          <p className="mt-1 text-sm text-zinc-600">Review event details, then approve or reject the pending submission.</p>
         </div>
-      </header>
+        <div>
+          <NotificationCenter userId={userId} role="faculty_admin" initialNotifications={notificationSnapshot.notifications} initialUnreadCount={notificationSnapshot.unreadCount} />
+        </div>
+      </div>
 
-      <section className="py-10 sm:py-14">
-        <div className="mb-6 flex justify-end"><NotificationCenter userId={userId} role="faculty_admin" initialNotifications={notificationSnapshot.notifications} initialUnreadCount={notificationSnapshot.unreadCount} /></div>
+      <section className="pt-6 sm:pt-8">
         {notificationSnapshot.error && <p role="status" className="mb-4 text-sm text-amber-800">Notifications are temporarily unavailable. Check that the notifications migration has been applied.</p>}
-        <p className="text-sm font-semibold uppercase tracking-[0.16em] text-indigo-700">Faculty/Admin</p>
-        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-zinc-950 sm:text-4xl">Event approval queue</h1>
-        <p className="mt-2 text-zinc-600">Review event details, then approve or reject the pending submission.</p>
 
-        {statusMessage && <p className={`mt-5 rounded-lg p-4 text-sm ${status === "approved" || status === "rejected" ? "bg-emerald-50 text-emerald-900" : "bg-amber-50 text-amber-950"}`} role={status === "approved" || status === "rejected" ? "status" : "alert"}>{statusMessage}</p>}
+        {statusMessage && <p className={`mb-6 rounded-lg p-4 text-sm ${status === "approved" || status === "rejected" ? "bg-emerald-50 text-emerald-900" : "bg-amber-50 text-amber-950"}`} role={status === "approved" || status === "rejected" ? "status" : "alert"}>{statusMessage}</p>}
         {error ? (
-          <p className="mt-8 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950" role="alert">We couldn’t load the approval queue. Confirm that both SQL migrations are applied, then refresh.</p>
+          <p className="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950" role="alert">We couldn’t load the approval queue. Confirm that both SQL migrations are applied, then refresh.</p>
         ) : events.length === 0 ? (
-          <section className="mt-8 rounded-2xl border border-dashed border-zinc-300 bg-white px-6 py-14 text-center">
+          <section className="rounded-2xl border border-dashed border-zinc-300 bg-white px-6 py-14 text-center">
             <h2 className="text-lg font-semibold text-zinc-900">The queue is clear</h2>
             <p className="mt-2 text-sm text-zinc-600">New organizer submissions will appear here for review.</p>
           </section>
