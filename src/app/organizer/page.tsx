@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import { connection } from "next/server";
 import Link from "next/link";
-import { signOutAction } from "@/backend/actions/dashboard";
 import { submitEventForApprovalAction } from "@/backend/actions/organizer";
 import { EventForm } from "@/app/organizer/event-form";
 import { requireUserRole } from "@/backend/lib/auth/require-role";
@@ -52,21 +51,8 @@ async function OrganizerContent({ searchParams }: OrganizerPageProps) {
   const migrationMissing = error?.code === "42P01" || error?.code === "PGRST205";
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-10">
-      <header className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm sm:px-6">
-        <Link href="/dashboard" className="text-lg font-bold tracking-tight text-indigo-800">CampusPlanner</Link>
-        <div className="flex items-center gap-4">
-          <nav aria-label="Organizer navigation" className="flex items-center gap-4 text-sm">
-            <Link href="/dashboard" className="font-medium text-indigo-700 hover:text-indigo-900">Browse events</Link>
-            <Link href="/organizer" aria-current="page" className="font-medium text-zinc-600">Organizer tools</Link>
-          </nav>
-          <form action={signOutAction}>
-            <button type="submit" className="rounded-lg border border-zinc-300 px-3 py-2 text-sm font-semibold text-zinc-800 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Sign out</button>
-          </form>
-        </div>
-      </header>
-
-      <div className="py-10 sm:py-14">
+    <main className="w-full max-w-6xl mx-auto px-4 py-6 sm:px-6 sm:py-10">
+      <div className="pb-10 sm:pb-14">
         <div className="mb-6 flex justify-end"><NotificationCenter userId={userId} role="organizer" initialNotifications={notificationSnapshot.notifications} initialUnreadCount={notificationSnapshot.unreadCount} /></div>
         {notificationSnapshot.error && <p role="status" className="mb-4 text-sm text-amber-800">Notifications are temporarily unavailable. Check that the notifications migration has been applied.</p>}
         <p className="text-sm font-semibold uppercase tracking-[0.16em] text-indigo-700">Organizer workspace</p>

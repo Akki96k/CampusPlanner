@@ -2,11 +2,13 @@ import { Suspense } from "react";
 import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { signOutAction } from "@/backend/actions/dashboard";
 import { escapeLikePattern, parseEventSearch } from "@/backend/lib/events/search";
 import { createClient } from "@/backend/lib/supabase/server";
 import type { CampusEvent } from "@/backend/lib/supabase/database.types";
 import { markAttendanceAction } from "@/backend/actions/registration";
+import { StudentSidebar } from "@/app/dashboard/student-sidebar";
+import { OrganizerSidebar } from "@/app/organizer/organizer-sidebar";
+import { FacultySidebar } from "@/app/faculty/faculty-sidebar";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Dashboard" };
@@ -95,30 +97,20 @@ async function DashboardContent({ searchParams }: DashboardPageProps) {
   const events: CampusEvent[] = eventsResult.data ?? [];
   const migrationMissing = eventsResult.error?.code === "42P01" || eventsResult.error?.code === "PGRST205";
 
-  return (
-    <main className="min-h-screen bg-[#f7f8fc] px-4 py-5 sm:px-7 sm:py-8">
-      <header className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-5 rounded-2xl border border-slate-200/80 bg-white px-5 py-4 shadow-sm sm:px-6">
-        <Link href="/dashboard" className="text-lg font-bold tracking-tight text-indigo-800">
-          CampusPlanner
-        </Link>
-        <div className="flex items-center gap-4">
-          <nav aria-label="Role tools" className="flex items-center gap-4 text-sm">
-            {organizerApproved && <Link href="/organizer" className="font-semibold text-indigo-700 hover:text-indigo-900">Organizer tools</Link>}
-            {profileResult.data?.role === "faculty_admin" && <Link href="/faculty" className="font-semibold text-indigo-700 hover:text-indigo-900">Approval queue</Link>}
-          </nav>
-          <p className="hidden text-sm text-zinc-600 sm:block">{displayName}</p>
-          <form action={signOutAction}>
-            <button
-              type="submit"
-              className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-semibold text-zinc-800 hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-            >
-              Sign out
-            </button>
-          </form>
-        </div>
-      </header>
+  const sidebar = role === "faculty_admin" ? (
+    <FacultySidebar />
+  ) : role === "organizer" && organizerApproved ? (
+    <OrganizerSidebar />
+  ) : (
+    <StudentSidebar email={email} />
+  );
 
-      <section className="mx-auto max-w-7xl py-8 sm:py-12">
+  return (
+    <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row">
+      {sidebar}
+      <div className="flex-1 min-w-0">
+        <main className="min-h-screen bg-[#f7f8fc] px-4 py-5 sm:px-7 sm:py-8">
+          <section className="mx-auto max-w-7xl pb-8 sm:pb-12">
         {role === "organizer" && !organizerApproved && <div className="mb-8 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm leading-6 text-amber-950" role="status"><p className="font-semibold">{organizerApplicationResult.data?.status === "rejected" ? "Organizer application rejected" : organizerApplicationResult.data?.status === "removed" ? "Organizer access restricted" : "Organizer application pending"}</p><p className="mt-1">{organizerApplicationResult.data?.status === "rejected" ? "Faculty did not approve this application. Organizer features are unavailable." : organizerApplicationResult.data?.status === "removed" ? "Faculty has removed access to organizer features." : "Your organizer account is awaiting faculty approval. You will receive access to organizer features once your application has been approved."}</p><Link href="/organizer/access" className="mt-2 inline-block font-semibold underline">View application status</Link></div>}
         {role === "student" && <section className="mb-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7" aria-labelledby="my-events-heading">
           <h2 id="my-events-heading" className="text-2xl font-bold tracking-tight text-slate-950">My Events</h2>
@@ -187,6 +179,8 @@ async function DashboardContent({ searchParams }: DashboardPageProps) {
         )}
       </section>
     </main>
+      </div>
+    </div>
   );
 }
 
@@ -232,8 +226,21 @@ function RegistrationCards({ registrations, events }: {
 
 function DashboardLoading() {
   return (
-    <main className="min-h-screen bg-[#f7f8fc] px-5 py-10" aria-busy="true">
-      <div className="mx-auto max-w-7xl animate-pulse"><div className="h-16 rounded-2xl bg-white" /><div className="mt-8 h-48 rounded-[2rem] bg-indigo-100" /><div className="mt-8 grid gap-5 sm:grid-cols-2"><div className="h-64 rounded-3xl bg-white" /><div className="h-64 rounded-3xl bg-white" /></div><p className="sr-only">Loading your dashboard…</p></div>
-    </main>
+    <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row" aria-busy="true">
+      <div className="hidden md:block md:w-64 lg:w-72 border-r border-slate-200 bg-white p-6 h-screen sticky top-0" />
+      <div className="flex-1 min-w-0">
+        <main className="min-h-screen bg-[#f7f8fc] px-5 py-10">
+          <div className="mx-auto max-w-7xl animate-pulse">
+            <div className="h-16 rounded-2xl bg-white" />
+            <div className="mt-8 h-48 rounded-[2rem] bg-indigo-100" />
+            <div className="mt-8 grid gap-5 sm:grid-cols-2">
+              <div className="h-64 rounded-3xl bg-white" />
+              <div className="h-64 rounded-3xl bg-white" />
+            </div>
+            <p className="sr-only">Loading your dashboard…</p>
+          </div>
+        </main>
+      </div>
+    </div>
   );
 }
